@@ -13,6 +13,11 @@ interface ContextoEstadoGlobal {
   adicionarTarefa: (tarefa: string) => void;
   editarTarefa: (id: number, novoTitulo: string) => void;
   excluirTarefa: (id: number) => void;
+  registrar: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
+  logout: () => void;
+  recuperarSenha: (email: string) => Promise<void>;
+  isAuthenticated: boolean;
 }
 
 // Cria o contexto global de estado
@@ -21,6 +26,11 @@ const ContextoEstadoGlobal = createContext<ContextoEstadoGlobal>({
   adicionarTarefa: () => { },
   editarTarefa: () => { },
   excluirTarefa: () => { },
+  registrar: async () => {},
+  login: async () => {},
+  logout: () => {},
+  recuperarSenha: async () => {},
+  isAuthenticated: false,
 });
 
 // Hook para acessar o contexto global de estado
@@ -28,8 +38,9 @@ export const useEstadoGlobal = () => useContext(ContextoEstadoGlobal);
 
 // Componente que fornece o contexto global de estado para seus filhos
 export const ProvedorEstadoGlobal: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Define o estado inicial das tarefas
+  // Define o estado inicial das tarefas e autenticação
   const [tarefas, setTarefas] = useState<Tarefa[]>([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Função para carregar as tarefas do backend
   const carregarTarefas = async () => {
@@ -38,7 +49,6 @@ export const ProvedorEstadoGlobal: React.FC<{ children: React.ReactNode }> = ({ 
       const response = await fetch('http://localhost:3000/tarefas', {
         headers: {
           'Authorization': `Bearer ${token}`,
-
         },
       });
 
@@ -71,9 +81,6 @@ export const ProvedorEstadoGlobal: React.FC<{ children: React.ReactNode }> = ({ 
       }
 
       const data = await response.json();
-      console.log('Nova tarefa adicionada:', data);
-
-      // Atualiza o estado das tarefas com a nova tarefa
       setTarefas([...tarefas, data]);
 
     } catch (error) {
@@ -98,9 +105,6 @@ export const ProvedorEstadoGlobal: React.FC<{ children: React.ReactNode }> = ({ 
         throw new Error('Não foi possível editar a tarefa');
       }
 
-      console.log('Tarefa editada com sucesso');
-
-      // Atualiza o estado das tarefas após a edição
       const novasTarefas = tarefas.map(tarefa =>
         tarefa.id === id ? { ...tarefa, tarefa: novoTitulo } : tarefa
       );
@@ -127,9 +131,6 @@ export const ProvedorEstadoGlobal: React.FC<{ children: React.ReactNode }> = ({ 
         throw new Error('Não foi possível excluir a tarefa');
       }
 
-      console.log('Tarefa excluída com sucesso');
-
-      // Atualiza o estado das tarefas após a exclusão
       const novasTarefas = tarefas.filter(tarefa => tarefa.id !== id);
       setTarefas(novasTarefas);
 
@@ -138,14 +139,101 @@ export const ProvedorEstadoGlobal: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  // Carrega as tarefas do backend na inicialização
+  // Função para registrar um novo usuário
+  const registrar = async (username: string, password: string) => {
+    try {
+      const response = await fetch('http://localhost:3000/registro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password, role: 'user' }), // Supondo que o role seja 'user'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error);
+      }
+
+      alert('Usuário registrado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao registrar:', error);
+      throw error;
+    }
+  };
+
+  // Função para autenticar o usuário (login)
+  const login = async (username: string, password: string) => {
+    try {
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error);
+      }
+
+      const { token } = await response.json();
+      await AsyncStorage.setItem('token', token);
+      setIsAuthenticated(true);
+      carregarTarefas(); // Carregar as tarefas após o login
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      throw error;
+    }
+  };
+
+  // Função para fazer logout
+  const logout = async () => {
+    await AsyncStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setTarefas([]); // Limpa as tarefas ao fazer logout
+  };
+
+  // Função para recuperar senha
+  const recuperarSenha = async (email: string) => {
+    try {
+      const response = await fetch('http://localhost:3000/recuperar-senha', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error);
+      }
+
+      alert('Instruções de recuperação de senha enviadas para o e-mail cadastrado.');
+    } catch (error) {
+      console.error('Erro ao solicitar a recuperação de senha:', error);
+      throw error;
+    }
+  };
+
+  // Verifica o token no AsyncStorage na inicialização e autentica o usuário automaticamente
   useEffect(() => {
-    carregarTarefas();
+    const verificarAutenticacao = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        setIsAuthenticated(true);
+        carregarTarefas();
+      }
+    };
+
+    verificarAutenticacao();
   }, []);
 
-  // Retorna o contexto global de estado com as funções para manipular as tarefas
+  // Retorna o contexto global de estado com as funções para manipular as tarefas e autenticação
   return (
-    <ContextoEstadoGlobal.Provider value={{ tarefas, adicionarTarefa, editarTarefa, excluirTarefa }}>
+    <ContextoEstadoGlobal.Provider value={{ tarefas, adicionarTarefa, editarTarefa, excluirTarefa, registrar, login, logout, recuperarSenha, isAuthenticated }}>
       {children}
     </ContextoEstadoGlobal.Provider>
   );

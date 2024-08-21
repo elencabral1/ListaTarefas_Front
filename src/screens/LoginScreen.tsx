@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 type Props = {
   navigation: NativeStackNavigationProp<any, any>;
@@ -45,19 +46,23 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <ImageBackground
-      source={require('../../assets/bg.png')}
-      style={styles.background}
-    >
-      <View style={styles.container}>
-        <Text style={styles.title}>TDSPY APP</Text>
-        {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
+    <View style={styles.container}>
+      <Text style={styles.title}>Login</Text>
+      <Text style={styles.subtitle}>Please sign in to continue.</Text>
+      {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
+      
+      <View style={styles.inputContainer}>
+        <FontAwesome name="envelope" size={20} color="#888" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Username"
           value={username}
           onChangeText={setUsername}
         />
+      </View>
+      
+      <View style={styles.inputContainer}>
+        <FontAwesome name="lock" size={20} color="#888" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Password"
@@ -65,56 +70,101 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           onChangeText={setPassword}
           secureTextEntry={true}
         />
-        <View style={styles.buttonContainer}>
-          <Button title="Login" onPress={handleLogin} />
-        </View>
       </View>
-    </ImageBackground>
+
+      <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+        <Text style={styles.forgotPassword}>Forgot?</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        <Text style={styles.loginButtonText}>Login</Text>
+      </TouchableOpacity>
+      <Text style={styles.signupText}>
+        Don't have an account?{' '}
+        <Text style={styles.signupLink} onPress={() => navigation.navigate('Register')}>
+          Sign up
+        </Text>
+      </Text>
+    </View>
   );
 };
 
+const { width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    resizeMode: 'cover', // Cobre toda a tela
-    justifyContent: 'center', // Centraliza o conteúdo verticalmente
-    alignItems: 'center', // Centraliza o conteúdo horizontalmente
-    width: '100%', // Largura total da tela
-    height: '100%', // Altura total da tela
-  },
   container: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Fundo branco semitransparente
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
-    borderRadius: 10,
-    width: '90%', // Proporção da largura da tela
-    maxWidth: 400, // Limita o tamanho máximo da largura
-    alignItems: 'center', // Centraliza os inputs no container
+    backgroundColor: '#f7f7f7',
   },
   title: {
-    fontSize: 30,
+    fontSize: 36,
     fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
+    color: '#000',
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+    marginLeft: 10, // Alinha o título à esquerda
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#888',
     marginBottom: 20,
+    alignSelf: 'flex-start',
+    marginLeft: 10,
   },
   error: {
     color: 'red',
     textAlign: 'center',
     marginBottom: 10,
   },
-  input: {
-    width: '100%', // Faz o input ocupar toda a largura disponível
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     marginBottom: 15,
-    backgroundColor: '#fff',
+    paddingHorizontal: 10,
   },
-  buttonContainer: {
-    marginTop: 10,
-    width: '100%', // Botão ocupa toda a largura disponível
-    borderRadius: 5,
+  icon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    height: 50,
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    color: '#FF8C00',
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  loginButton: {
+    width: '100%',
+    maxWidth: 400,
+    height: 50,
+    backgroundColor: '#FF8C00',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  signupText: {
+    color: '#888',
+    fontSize: 14,
+  },
+  signupLink: {
+    color: '#FF8C00',
+    fontWeight: 'bold',
   },
 });
 
