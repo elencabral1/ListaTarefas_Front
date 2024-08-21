@@ -1,79 +1,121 @@
-import React, { useState } from 'react';
-import { Box, VStack, Text, Center } from 'native-base';
-import CustomInput from '../components/CustomInput';
-import CustomButton from '../components/CustomButton';
+import AsyncStorage from '@react-native-community/async-storage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-// Defina o tipo das rotas
-type RootStackParamList = {
-  Login: undefined;
-  Home: undefined;
-};
-
-// Defina o tipo das props do LoginScreen
-type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground } from 'react-native';
 
 type Props = {
-  navigation: LoginScreenNavigationProp;
+  navigation: NativeStackNavigationProp<any, any>;
 };
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleLogin = async () => {
-      console.log('Tentando login com:', { username, password }); // Log para depuração
+    if (!username || !password) {
+      setErrorMessage('Por favor, preencha todos os campos.');
+      return;
+    }
 
-      try {
-          const response = await fetch('http://localhost:3000/login', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ username, password }),
-          });
+    try {
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-          console.log('Resposta do servidor:', response); // Log da resposta do servidor
-
-          if (!response.ok) {
-              throw new Error('Login falhou');
-          }
-
-          const data = await response.json();
-          console.log('Login bem-sucedido:', data);
-          // Navegue para a próxima tela, se o login for bem-sucedido
-          navigation.navigate('Home');
-      } catch (error) {
-          console.error('Erro ao fazer login:', error);
-          alert('Falha no login, por favor, tente novamente.');
+      if (!response.ok) {
+        setErrorMessage('Erro ao fazer login. Verifique suas credenciais.');
+        return;
       }
+
+      const data = await response.json();
+      const token = data.token;
+
+      await AsyncStorage.setItem('token', token);
+
+      setErrorMessage(null);
+      navigation.navigate('Home');
+    } catch (error) {
+      setErrorMessage('Erro de conexão. Tente novamente mais tarde.');
+    }
   };
 
   return (
-      <Center flex={1} bg="gray.100">
-          <Box safeArea p="4" py="8" w="90%" maxW="290">
-              <Text fontSize="2xl" fontWeight="bold" color="blue.500" textAlign="center" mb="4">
-                  Bem-vindo(a) ao App
-              </Text>
-              <VStack space={4}>
-                  <CustomInput
-                      placeholder="Nome de usuário"
-                      value={username}
-                      onChangeText={setUsername}
-                  />
-                  <CustomInput
-                      placeholder="Senha"
-                      type="password"
-                      value={password}
-                      onChangeText={setPassword}
-                  />
-                  <CustomButton onPress={handleLogin}>
-                      Entrar
-                  </CustomButton>
-              </VStack>
-          </Box>
-      </Center>
+    <ImageBackground
+      source={require('../../assets/bg.png')}
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>TDSPY APP</Text>
+        {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={true}
+        />
+        <View style={styles.buttonContainer}>
+          <Button title="Login" onPress={handleLogin} />
+        </View>
+      </View>
+    </ImageBackground>
   );
 };
+
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover', // Cobre toda a tela
+    justifyContent: 'center', // Centraliza o conteúdo verticalmente
+    alignItems: 'center', // Centraliza o conteúdo horizontalmente
+    width: '100%', // Largura total da tela
+    height: '100%', // Altura total da tela
+  },
+  container: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Fundo branco semitransparente
+    padding: 20,
+    borderRadius: 10,
+    width: '90%', // Proporção da largura da tela
+    maxWidth: 400, // Limita o tamanho máximo da largura
+    alignItems: 'center', // Centraliza os inputs no container
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  error: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  input: {
+    width: '100%', // Faz o input ocupar toda a largura disponível
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 15,
+    backgroundColor: '#fff',
+  },
+  buttonContainer: {
+    marginTop: 10,
+    width: '100%', // Botão ocupa toda a largura disponível
+    borderRadius: 5,
+  },
+});
 
 export default LoginScreen;
