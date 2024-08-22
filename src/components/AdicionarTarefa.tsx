@@ -27,12 +27,12 @@ const AdicionarTarefa: React.FC = () => {
       {/* contêiner para o campo de entrada e botão de adição */}
       <View style={styles.inputContainer}>
         <Input
-          placeholder="digite uma tarefa" // texto de espaço reservado no campo de entrada
-          placeholderTextColor="#888" // cor do texto do espaço reservado
-          value={novaTarefa} // valor atual do campo de entrada
-          onChangeText={setNovaTarefa} // atualiza o estado com o texto do campo de entrada
-          fontSize={18} // tamanho da fonte do texto no campo de entrada
-          color="#000" // cor do texto no campo de entrada
+          placeholder="digite uma tarefa" 
+          placeholderTextColor="#888" 
+          value={novaTarefa} 
+          onChangeText={setNovaTarefa} 
+          fontSize={18} 
+          color="#000" 
           style={styles.input} // estilo aplicado ao campo de entrada
         />
         <IconButton
