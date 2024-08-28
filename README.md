@@ -12,5 +12,5 @@
 - *550137 - guilherme riofrio*
 
 
-*rodar a aplicação junto com o backend do proejeto*
+*rodar a aplicação junto com o backend do projeto*
 *https://github.com/caiorr1/backend-lista_tarefas*
