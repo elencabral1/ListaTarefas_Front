@@ -4,16 +4,22 @@ import { StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useEstadoGlobal } from '../hooks/EstadoGlobal';
 
+// Define a interface para as propriedades de um item de tarefa
 interface TarefaItemProps {
   id: number;
   tarefa: string;
 }
 
+// Componente para exibir um item de tarefa
 const TarefaItem: React.FC<TarefaItemProps> = ({ id, tarefa }) => {
+  // Usa o hook de estado global para acessar funções de edição e exclusão de tarefas
   const { editarTarefa, excluirTarefa } = useEstadoGlobal();
+  // Estado local para controlar se o item está em modo de edição
   const [editando, setEditando] = React.useState(false);
+  // Estado local para armazenar o novo título da tarefa
   const [novoTitulo, setNovoTitulo] = React.useState(tarefa);
 
+  // Função para alternar o modo de edição e salvar mudanças
   const handleEditar = () => {
     if (editando) {
       editarTarefa(id, novoTitulo);
