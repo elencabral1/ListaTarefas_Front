@@ -48,11 +48,11 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
-      <Text style={styles.subtitle}>Please sign in to continue.</Text>
+      <Text style={styles.subtitle}>Entre para continuar</Text>
       {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
       
       <View style={styles.inputContainer}>
-        <FontAwesome name="envelope" size={20} color="#888" style={styles.icon} />
+        <FontAwesome name="envelope" size={20} color="#0096FF" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Username"
@@ -62,7 +62,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       </View>
       
       <View style={styles.inputContainer}>
-        <FontAwesome name="lock" size={20} color="#888" style={styles.icon} />
+        <FontAwesome name="lock" size={20} color="#0096FF" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Password"
@@ -73,15 +73,15 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       </View>
 
       <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-        <Text style={styles.forgotPassword}>Forgot?</Text>
+        <Text style={styles.forgotPassword}>Forgot Password?</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
       <Text style={styles.signupText}>
-        Don't have an account?{' '}
+        Não tem uma conta?{' '}
         <Text style={styles.signupLink} onPress={() => navigation.navigate('Register')}>
-          Sign up
+          Registre-se
         </Text>
       </Text>
     </View>
@@ -96,75 +96,74 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#F8F9FA',
   },
   title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#000',
-    alignSelf: 'flex-start',
-    marginBottom: 10,
-    marginLeft: 10, // Alinha o título à esquerda
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#888',
-    marginBottom: 20,
-    alignSelf: 'flex-start',
-    marginLeft: 10,
+    color: '#666',
+    marginBottom: 24,
   },
   error: {
-    color: 'red',
+    color: '#D9534F',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    maxWidth: 400,
-    backgroundColor: '#fff',
+    maxWidth: 360,
+    backgroundColor: '#FFF',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    marginBottom: 15,
-    paddingHorizontal: 10,
+    borderColor: '#DEE2E6',
+    borderRadius: 8,
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    elevation: 1, // Add shadow for modern look
   },
   icon: {
-    marginRight: 10,
+    marginRight: 12,
   },
   input: {
     flex: 1,
-    height: 50,
+    height: 45,
+    fontSize: 16,
+    color: '#333',
   },
   forgotPassword: {
     alignSelf: 'flex-end',
-    color: '#FF8C00',
-    fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#0096FF',
+    fontWeight: '600',
+    marginBottom: 24,
   },
   loginButton: {
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 360,
     height: 50,
-    backgroundColor: '#FF8C00',
-    borderRadius: 10,
+    backgroundColor: '#0096FF',
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#FFF',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   signupText: {
-    color: '#888',
+    color: '#666',
     fontSize: 14,
   },
   signupLink: {
-    color: '#FF8C00',
-    fontWeight: 'bold',
+    color: '#0096FF',
+    fontWeight: '600',
   },
 });
 
